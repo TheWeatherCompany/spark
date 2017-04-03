@@ -37,6 +37,7 @@ import org.apache.spark.network.netty.SparkTransportConf
 import org.apache.spark.network.sasl.{SaslClientBootstrap, SaslServerBootstrap}
 import org.apache.spark.network.server._
 import org.apache.spark.rpc._
+import org.apache.spark.rpc.netty.tracing._
 import org.apache.spark.serializer.{JavaSerializer, JavaSerializerInstance}
 import org.apache.spark.util.{ThreadUtils, Utils}
 
@@ -250,13 +251,15 @@ private[netty] class NettyRpcEnv(
   }
 
   private[netty] def serialize(content: Any): ByteBuffer = {
-    javaSerializerInstance.serialize(content)
+    javaSerializerInstance.serialize(new Span[Any](content))
   }
 
   private[netty] def deserialize[T: ClassTag](client: TransportClient, bytes: ByteBuffer): T = {
     NettyRpcEnv.currentClient.withValue(client) {
       deserialize { () =>
-        javaSerializerInstance.deserialize[T](bytes)
+        val span = javaSerializerInstance.deserialize[Span[T]](bytes)
+        span.recpt(client.getSocketAddress)
+        span.getPayload
       }
     }
   }
