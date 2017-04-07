@@ -42,6 +42,7 @@ import org.apache.spark.internal.config._
 import org.apache.spark.launcher.YarnCommandBuilderUtils
 import org.apache.spark.network.util.JavaUtils
 import org.apache.spark.util.Utils
+import org.apache.spark.util.tracing._
 
 private[yarn] class ExecutorRunnable(
     container: Option[Container],
@@ -121,6 +122,7 @@ private[yarn] class ExecutorRunnable(
 
     // Send the start request to the ContainerManager
     try {
+      EventTrace.log(SpawnExecutor(executorId))
       nmClient.startContainer(container.get, ctx)
     } catch {
       case ex: Exception =>

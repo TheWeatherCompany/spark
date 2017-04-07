@@ -242,6 +242,8 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
     var workerUrl: Option[String] = None
     val userClassPath = new mutable.ListBuffer[URL]()
 
+    import org.apache.spark.util.tracing._
+    EventTrace.logStartup()
     var argv = args.toList
     while (!argv.isEmpty) {
       argv match {
@@ -282,6 +284,7 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
     }
 
     run(driverUrl, executorId, hostname, cores, appId, workerUrl, userClassPath)
+    EventTrace.log(MainEnd())
     System.exit(0)
   }
 

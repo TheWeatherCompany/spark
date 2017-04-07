@@ -45,7 +45,8 @@ private[netty] class NettyRpcEnv(
     val conf: SparkConf,
     javaSerializerInstance: JavaSerializerInstance,
     host: String,
-    securityManager: SecurityManager) extends RpcEnv(conf) with Logging {
+    securityManager: SecurityManager,
+    spanWriter: SpanWriter) extends RpcEnv(conf) with Logging {
 
   private[netty] val transportConf = SparkTransportConf.fromSparkConf(
     conf.clone.set("spark.rpc.io.numConnectionsPerPeer", "1"),
@@ -251,14 +252,14 @@ private[netty] class NettyRpcEnv(
   }
 
   private[netty] def serialize(content: Any): ByteBuffer = {
-    javaSerializerInstance.serialize(new Span[Any](content))
+    javaSerializerInstance.serialize(new Span[Any](content, spanWriter))
   }
 
   private[netty] def deserialize[T: ClassTag](client: TransportClient, bytes: ByteBuffer): T = {
     NettyRpcEnv.currentClient.withValue(client) {
       deserialize { () =>
         val span = javaSerializerInstance.deserialize[Span[T]](bytes)
-        span.recpt(client.getSocketAddress)
+        span.recpt(client.getChannel, spanWriter)
         span.getPayload
       }
     }
@@ -443,7 +444,7 @@ private[rpc] class NettyRpcEnvFactory extends RpcEnvFactory with Logging {
       new JavaSerializer(sparkConf).newInstance().asInstanceOf[JavaSerializerInstance]
     val nettyEnv =
       new NettyRpcEnv(sparkConf, javaSerializerInstance, config.advertiseAddress,
-        config.securityManager)
+        config.securityManager, new SpanWriter(config.name))
     if (!config.clientMode) {
       val startNettyRpcEnv: Int => (NettyRpcEnv, Int) = { actualPort =>
         nettyEnv.startServer(config.bindAddress, actualPort)
