@@ -35,6 +35,7 @@ import org.apache.spark.scheduler.{ExecutorLossReason, TaskDescription}
 import org.apache.spark.scheduler.cluster.CoarseGrainedClusterMessages._
 import org.apache.spark.serializer.SerializerInstance
 import org.apache.spark.util.{ThreadUtils, Utils}
+import org.apache.spark.util.tracing._
 
 private[spark] class CoarseGrainedExecutorBackend(
     override val rpcEnv: RpcEnv,
@@ -242,8 +243,7 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
     var workerUrl: Option[String] = None
     val userClassPath = new mutable.ListBuffer[URL]()
 
-    import org.apache.spark.util.tracing._
-    EventTrace.logStartup()
+    EventTraceLogger.logStartup()
     var argv = args.toList
     while (!argv.isEmpty) {
       argv match {
@@ -284,7 +284,7 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
     }
 
     run(driverUrl, executorId, hostname, cores, appId, workerUrl, userClassPath)
-    EventTrace.log(MainEnd())
+    EventTraceLogger.log(MainEnd)
     System.exit(0)
   }
 

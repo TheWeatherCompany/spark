@@ -33,6 +33,7 @@ import org.apache.spark.scheduler.MapStatus
 import org.apache.spark.shuffle.MetadataFetchFailedException
 import org.apache.spark.storage.{BlockId, BlockManagerId, ShuffleBlockId}
 import org.apache.spark.util._
+import org.apache.spark.util.tracing._
 
 private[spark] sealed trait MapOutputTrackerMessage
 private[spark] case class GetMapOutputStatuses(shuffleId: Int)
@@ -370,6 +371,7 @@ private[spark] class MapOutputTrackerMaster(conf: SparkConf,
     if (mapStatuses.put(shuffleId, new Array[MapStatus](numMaps)).isDefined) {
       throw new IllegalArgumentException("Shuffle ID " + shuffleId + " registered twice")
     }
+    EventTraceLogger.log(TrackerRegisterShuffle(shuffleId))
     // add in advance
     shuffleIdLocks.putIfAbsent(shuffleId, new Object())
   }

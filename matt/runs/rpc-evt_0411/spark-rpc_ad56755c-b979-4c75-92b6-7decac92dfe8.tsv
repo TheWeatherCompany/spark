@@ -1,0 +1,23 @@
+id	time	src_name	src_addr	src_port	dst_name	dst_addr	dst_port	type
+54903070	1492087375828	sparkDriver	10.50.108.70	43844	driverPropsFetcher	10.50.108.70	56748	true
+54903071	1492087375880	sparkDriver	10.50.108.70	43844	driverPropsFetcher	10.50.108.70	56748	SparkAppConfig(ArrayBuffer((spark.driver.port,43844), (spark.driver.host,10.50.108.70), (spark.executor.id,driver), (spark.worker.ui.port,5010), (spark.driver.appUIAddress,http://10.50.108.70:4040), (spark.master,yarn), (spark.repl.class.outputDir,/tmp/spark-4992f67e-b4be-4e26-9fce-2298e57bc700/repl-2f32c4a7-fa65-4a9e-b53f-18840b7174ef), (spark.app.name,Spark shell), (spark.master.ui.port,5010), (spark.sql.catalogImplementation,hive), (spark.repl.class.uri,spark://10.50.108.70:43844/classes), (spark.jars,), (spark.home,/home/matt/code/spark-tracing), (spark.submit.deployMode,client)),None)
+54903072	1492087375931	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	true
+54903073	1492087375969	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	true
+54903074	1492087376119	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	true
+54903075	1492087376132	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	true
+54903076	1492087376145	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	RequestMessage(10.50.108.70:43844,NettyRpcEndpointRef(null),RegisteredExecutor)
+54903077	1492087376146	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	true
+54903078	1492087376186	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	BlockManagerId(1, localhost.localdomain, 45523, None)
+54903079	1492087376197	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	true
+54903090	1492087383395	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	RequestMessage(10.50.108.70:43844,NettyRpcEndpointRef(null),LaunchTask(org.apache.spark.util.SerializableBuffer@7d380064))
+54903093	1492087383526	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	ArrayBuffer(BlockManagerId(driver, 10.50.108.70, 46707, None))
+54903094	1492087383596	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	true
+54903096	1492087383828	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	RequestMessage(10.50.108.70:43844,NettyRpcEndpointRef(null),LaunchTask(org.apache.spark.util.SerializableBuffer@37daed93))
+54903099	1492087383871	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	RequestMessage(10.50.108.70:43844,NettyRpcEndpointRef(null),LaunchTask(org.apache.spark.util.SerializableBuffer@807a12e))
+54903100	1492087383894	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	RequestMessage(10.50.108.70:43844,NettyRpcEndpointRef(null),LaunchTask(org.apache.spark.util.SerializableBuffer@3581ab6a))
+54903102	1492087383920	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	RequestMessage(10.50.108.70:43844,NettyRpcEndpointRef(null),LaunchTask(org.apache.spark.util.SerializableBuffer@6ccd19bf))
+54903105	1492087383969	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	RequestMessage(10.50.108.70:43844,NettyRpcEndpointRef(null),LaunchTask(org.apache.spark.util.SerializableBuffer@c1bd7c0))
+54903107	1492087383989	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	RequestMessage(10.50.108.70:43844,NettyRpcEndpointRef(null),LaunchTask(org.apache.spark.util.SerializableBuffer@39a009bc))
+54903108	1492087384017	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	RequestMessage(10.50.108.70:43844,NettyRpcEndpointRef(null),LaunchTask(org.apache.spark.util.SerializableBuffer@1423f19))
+54903111	1492087384056	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	RequestMessage(10.50.108.70:43844,NettyRpcEndpointRef(null),LaunchTask(org.apache.spark.util.SerializableBuffer@546ce6f))
+54903116	1492087384491	sparkDriver	10.50.108.70	43844	sparkExecutor	10.50.108.70	56750	RequestMessage(10.50.108.70:43844,NettyRpcEndpointRef(null),StopExecutor)

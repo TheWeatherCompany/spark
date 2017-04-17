@@ -47,6 +47,7 @@ import org.apache.spark.api.r.RUtils
 import org.apache.spark.deploy.rest._
 import org.apache.spark.launcher.SparkLauncher
 import org.apache.spark.util.{ChildFirstURLClassLoader, MutableURLClassLoader, Utils}
+import org.apache.spark.util.tracing._
 
 /**
  * Whether to submit, kill, or request the status of an application.
@@ -116,8 +117,7 @@ object SparkSubmit {
   // scalastyle:on println
 
   def main(args: Array[String]): Unit = {
-    import org.apache.spark.util.tracing._
-    EventTrace.logStartup()
+    EventTraceLogger.logStartup()
     val appArgs = new SparkSubmitArguments(args)
     if (appArgs.verbose) {
       // scalastyle:off println
@@ -129,7 +129,7 @@ object SparkSubmit {
       case SparkSubmitAction.KILL => kill(appArgs)
       case SparkSubmitAction.REQUEST_STATUS => requestStatus(appArgs)
     }
-    EventTrace.log(MainEnd())
+    EventTraceLogger.log(MainEnd)
   }
 
   /**

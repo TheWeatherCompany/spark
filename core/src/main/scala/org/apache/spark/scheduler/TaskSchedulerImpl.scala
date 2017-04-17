@@ -35,6 +35,7 @@ import org.apache.spark.scheduler.TaskLocality.TaskLocality
 import org.apache.spark.scheduler.local.LocalSchedulerBackend
 import org.apache.spark.storage.BlockManagerId
 import org.apache.spark.util.{AccumulatorV2, ThreadUtils, Utils}
+import org.apache.spark.util.tracing._
 
 /**
  * Schedules tasks for multiple types of clusters by acting through a SchedulerBackend.
@@ -170,6 +171,7 @@ private[spark] class TaskSchedulerImpl(
   }
 
   override def submitTasks(taskSet: TaskSet) {
+    EventTraceLogger.log(SubmitTaskSet(taskSet.id))
     val tasks = taskSet.tasks
     logInfo("Adding task set " + taskSet.id + " with " + tasks.length + " tasks")
     this.synchronized {

@@ -17,8 +17,9 @@
 
 package org.apache.spark.rpc.netty.tracing
 
-import java.io.{FileWriter, Serializable, Writer}
+import java.io.Serializable
 import java.net.SocketAddress
+import java.util.concurrent.atomic.AtomicLong
 import java.util.Random
 
 import io.netty.channel.Channel
@@ -26,46 +27,29 @@ import io.netty.channel.Channel
 import org.apache.spark.util.tracing._
 
 private[netty] class Span[T](payload: T, writer: SpanWriter) extends Serializable {
-  // private def logStackTrace() = Thread.currentThread.getStackTrace.foreach(call =>
-  //   logInfo("[STACK] " + call.toString))
+  private case class ReceiveInfo(source: (String, String), destination: (String, String))
   private val id = writer.makeId
-  private var origin, recipient = Array("", "")
-  private val srcName = writer.getName
+  private val srcName = writer.name
   private val sent = System.currentTimeMillis
 
-  private def write(out: SpanWriter): Unit = {
-    out.write(Map("id" -> id.toString, "time" -> sent.toString, "src_name" -> srcName,
-      "src_addr" -> origin(0), "src_port" -> origin(1), "dst_name" -> out.getName,
-      "dst_addr" -> recipient(0), "dst_port" -> recipient(1), "type" -> payload.toString))
+  private def write(out: SpanWriter, info: ReceiveInfo): Unit = {
+    RpcTraceLogger.write(Map("id" -> id.toString, "time" -> sent.toString, "src_name" -> srcName,
+      "src_addr" -> info.source._1, "src_port" -> info.source._2, "dst_name" -> out.name,
+      "dst_addr" -> info.destination._1, "dst_port" -> info.destination._2, "type" ->
+      payload.toString))
   }
   def recpt(channel: Channel, writer: SpanWriter): Unit = {
-    def addrsplit(addr: SocketAddress) = if (addr != null) addr.toString.substring(1).split(":")
-      else Array("", "")
-    origin = addrsplit(channel.remoteAddress)
-    recipient = addrsplit(channel.localAddress)
-    write(writer) // logInfo(">>>> Received: " + toString)
+    def addrsplit(addr: SocketAddress) = if (addr == null) ("", "") else addr.toString
+      .substring(1).split(":") match {
+      case Array(x, y) => (x, y)
+    }
+    val info = ReceiveInfo(addrsplit(channel.remoteAddress()), addrsplit(channel.localAddress()))
+    write(writer, info)
   }
   def getPayload: T = payload
-  // logInfo(">>>> Created: " + toString)
 }
 
-private[netty] class SpanWriter(name: String) {
-  private var nextid = new Random().nextInt.toLong + Integer.MAX_VALUE
-  def getName: String = name
-  def makeId: Long = {
-    nextid += 1
-    nextid
-  }
-  private[tracing] def write(values: Map[String, String]): Unit = SpanWriter.write(values)
-}
-
-private[netty] object SpanWriter {
-  private val output: Writer = new FileWriter("/tmp/spark-rpc_" + EventTrace.getId + ".tsv")
-  private val columns = List("id", "time", "src_name", "src_addr", "src_port", "dst_name",
-    "dst_addr", "dst_port", "type")
-  private[tracing] def write(values: Map[String, String]): Unit = this.synchronized {
-    output.write(columns.map(values(_)).mkString("\t") + "\n")
-    output.flush()
-  }
-  output.write(columns.mkString("\t") + "\n")
+private[netty] class SpanWriter(val name: String) {
+  private var nextid = new AtomicLong(new Random().nextInt.toLong + Integer.MAX_VALUE)
+  def makeId: Long = nextid.incrementAndGet
 }

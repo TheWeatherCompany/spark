@@ -1,0 +1,7 @@
+id	time	src_name	src_addr	src_port	dst_name	dst_addr	dst_port	type
+2296251660	1492089271060	sparkMaster	ynalloc1.fyre.ibm.com/172.16.181.46	7077	sparkWorker	172.16.189.65	43398	true
+2296251661	1492089271113	sparkMaster	ynalloc1.fyre.ibm.com/172.16.181.46	7077	sparkWorker	172.16.189.65	43398	RegisteredWorker(NettyRpcEndpointRef(spark://Master@dynalloc1.fyre.ibm.com:7077),http://dynalloc1.fyre.ibm.com:5010)
+2296251662	1492089271115	sparkMaster	ynalloc1.fyre.ibm.com/172.16.181.46	7077	sparkWorker	172.16.189.65	43398	RequestMessage(dynalloc1.fyre.ibm.com:7077,NettyRpcEndpointRef(spark://Worker@172.16.189.65:34002),LaunchExecutor(spark://dynalloc1.fyre.ibm.com:7077,app-20170413061429-0000,2,ApplicationDescription(Spark shell),8,1024))
+1063221568	1492089273509	sparkExecutor	172.16.189.65	57044	sparkWorker	172.16.189.65	34002	RequestMessage(null,NettyRpcEndpointRef(spark://endpoint-verifier@172.16.189.65:34002),CheckExistence(Worker))
+2296251665	1492089339444	sparkMaster	ynalloc1.fyre.ibm.com/172.16.181.46	7077	sparkWorker	172.16.189.65	43398	RequestMessage(dynalloc1.fyre.ibm.com:7077,NettyRpcEndpointRef(spark://Worker@172.16.189.65:34002),KillExecutor(spark://dynalloc1.fyre.ibm.com:7077,app-20170413061429-0000,2))
+2296251668	1492089339447	sparkMaster	ynalloc1.fyre.ibm.com/172.16.181.46	7077	sparkWorker	172.16.189.65	43398	RequestMessage(dynalloc1.fyre.ibm.com:7077,NettyRpcEndpointRef(spark://Worker@172.16.189.65:34002),ApplicationFinished(app-20170413061429-0000))

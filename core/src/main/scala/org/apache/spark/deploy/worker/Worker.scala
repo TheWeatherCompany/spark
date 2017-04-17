@@ -39,6 +39,7 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.metrics.MetricsSystem
 import org.apache.spark.rpc._
 import org.apache.spark.util.{ThreadUtils, Utils}
+import org.apache.spark.util.tracing._
 
 private[deploy] class Worker(
     override val rpcEnv: RpcEnv,
@@ -690,12 +691,14 @@ private[deploy] object Worker extends Logging {
   val ENDPOINT_NAME = "Worker"
 
   def main(argStrings: Array[String]) {
+    EventTraceLogger.logStartup()
     Utils.initDaemon(log)
     val conf = new SparkConf
     val args = new WorkerArguments(argStrings, conf)
     val rpcEnv = startRpcEnvAndEndpoint(args.host, args.port, args.webUiPort, args.cores,
       args.memory, args.masters, args.workDir, conf = conf)
     rpcEnv.awaitTermination()
+    EventTraceLogger.log(MainEnd)
   }
 
   def startRpcEnvAndEndpoint(

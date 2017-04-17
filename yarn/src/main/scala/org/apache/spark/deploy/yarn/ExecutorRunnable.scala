@@ -122,7 +122,7 @@ private[yarn] class ExecutorRunnable(
 
     // Send the start request to the ContainerManager
     try {
-      EventTrace.log(SpawnExecutor(executorId))
+      EventTraceLogger.log(SpawnExecutor(executorId))
       nmClient.startContainer(container.get, ctx)
     } catch {
       case ex: Exception =>

@@ -1,0 +1,4 @@
+id	time	src_name	src_addr	src_port	dst_name	dst_addr	dst_port	type
+54903068	1492087372977	sparkDriver	10.50.108.70	43844	sparkYarnAM	10.50.108.70	56740	true
+54903069	1492087373211	sparkDriver	10.50.108.70	43844	sparkYarnAM	10.50.108.70	56740	0
+54903114	1492087384467	sparkDriver	10.50.108.70	43844	sparkYarnAM	10.50.108.70	56740	RequestMessage(10.50.108.70:43844,NettyRpcEndpointRef(null),RequestExecutors(0,0,Map()))

@@ -44,6 +44,7 @@ import org.apache.spark.rpc._
 import org.apache.spark.scheduler.cluster.{CoarseGrainedSchedulerBackend, YarnSchedulerBackend}
 import org.apache.spark.scheduler.cluster.CoarseGrainedClusterMessages._
 import org.apache.spark.util._
+import org.apache.spark.util.tracing._
 
 /**
  * Common application master functionality for Spark on Yarn.
@@ -750,8 +751,7 @@ object ApplicationMaster extends Logging {
   private var master: ApplicationMaster = _
 
   def main(args: Array[String]): Unit = {
-    import org.apache.spark.util.tracing._
-    EventTrace.logStartup()
+    EventTraceLogger.logStartup()
     SignalUtils.registerLogger(log)
     val amArgs = new ApplicationMasterArguments(args)
 
@@ -766,7 +766,7 @@ object ApplicationMaster extends Logging {
     SparkHadoopUtil.get.runAsSparkUser { () =>
       master = new ApplicationMaster(amArgs, new YarnRMClient)
       val exitCode = master.run()
-      EventTrace.log(MainEnd())
+      EventTraceLogger.log(MainEnd)
       System.exit(exitCode)
     }
   }

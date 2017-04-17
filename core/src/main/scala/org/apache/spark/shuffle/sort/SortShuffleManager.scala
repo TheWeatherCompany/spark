@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap
 import org.apache.spark._
 import org.apache.spark.internal.Logging
 import org.apache.spark.shuffle._
+import org.apache.spark.util.tracing._
 
 /**
  * In sort-based shuffle, incoming records are sorted according to their target partition ids, then
@@ -88,6 +89,7 @@ private[spark] class SortShuffleManager(conf: SparkConf) extends ShuffleManager 
       shuffleId: Int,
       numMaps: Int,
       dependency: ShuffleDependency[K, V, C]): ShuffleHandle = {
+    EventTraceLogger.log(RegisterShuffle(shuffleId))
     if (SortShuffleWriter.shouldBypassMergeSort(SparkEnv.get.conf, dependency)) {
       // If there are fewer than spark.shuffle.sort.bypassMergeThreshold partitions and we don't
       // need map-side aggregation, then write numPartitions files directly and just concatenate
@@ -152,6 +154,7 @@ private[spark] class SortShuffleManager(conf: SparkConf) extends ShuffleManager 
 
   /** Remove a shuffle's metadata from the ShuffleManager. */
   override def unregisterShuffle(shuffleId: Int): Boolean = {
+    EventTraceLogger.log(UnregisterShuffle(shuffleId))
     Option(numMapsForShuffle.remove(shuffleId)).foreach { numMaps =>
       (0 until numMaps).foreach { mapId =>
         shuffleBlockResolver.removeDataByMap(shuffleId, mapId)
