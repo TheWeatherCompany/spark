@@ -1,5 +1,0 @@
-id	time	type
-ad56755c-b979-4c75-92b6-7decac92dfe8	1492087374782	JVMStart()
-ad56755c-b979-4c75-92b6-7decac92dfe8	1492087375045	MainStart()
-ad56755c-b979-4c75-92b6-7decac92dfe8	1492087383531	BlockFetch(10.50.108.70,46707,driver,WrappedArray(broadcast_0_piece0))
-ad56755c-b979-4c75-92b6-7decac92dfe8	1492087384531	MainEnd()

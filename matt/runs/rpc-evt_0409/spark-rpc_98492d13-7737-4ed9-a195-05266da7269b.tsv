@@ -1,4 +1,0 @@
-id	time	src_name	src_addr	src_port	dst_name	dst_addr	dst_port	type
-1632220952	1491575062395	sparkDriver	10.50.108.70	38539	sparkYarnAM	10.50.108.70	40062	true
-1632220953	1491575062642	sparkDriver	10.50.108.70	38539	sparkYarnAM	10.50.108.70	40062	0
-1632220998	1491575073745	sparkDriver	10.50.108.70	38539	sparkYarnAM	10.50.108.70	40062	RequestMessage(10.50.108.70:38539,NettyRpcEndpointRef(null),RequestExecutors(0,0,Map()))

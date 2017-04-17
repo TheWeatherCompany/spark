@@ -1,6 +1,0 @@
-id	time	type
-ab61a89f-cac2-4ea1-a5da-cdff2acfc9b3	1492087371572	JVMStart()
-ab61a89f-cac2-4ea1-a5da-cdff2acfc9b3	1492087371855	MainStart()
-ab61a89f-cac2-4ea1-a5da-cdff2acfc9b3	1492087374693	SpawnExecutor(1)
-ab61a89f-cac2-4ea1-a5da-cdff2acfc9b3	1492087376287	SpawnExecutor(2)
-ab61a89f-cac2-4ea1-a5da-cdff2acfc9b3	1492087384628	MainEnd()

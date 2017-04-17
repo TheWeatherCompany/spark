@@ -1,5 +1,0 @@
-id	time	type
-b080e439-a330-44cb-a460-02b8a8add4a0	1492089271296	JVMStart()
-b080e439-a330-44cb-a460-02b8a8add4a0	1492089271712	MainStart()
-b080e439-a330-44cb-a460-02b8a8add4a0	1492089285878	BlockFetch(172.16.181.46,37472,driver,WrappedArray(broadcast_0_piece0))
-b080e439-a330-44cb-a460-02b8a8add4a0	1492089339296	MainEnd()
