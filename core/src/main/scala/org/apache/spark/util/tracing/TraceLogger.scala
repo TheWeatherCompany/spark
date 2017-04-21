@@ -18,39 +18,56 @@
 package org.apache.spark.util.tracing
 
 import java.lang.management.ManagementFactory
-import java.util.UUID
+import java.net.{InetSocketAddress, SocketAddress}
+import java.util.{Random, UUID}
+import java.util.concurrent.atomic.AtomicLong
 
-import org.slf4j.LoggerFactory
+import io.netty.channel.Channel
 
-trait TraceEvent
+import org.apache.spark.SparkFirehoseListener
+import org.apache.spark.internal.Logging
+import org.apache.spark.scheduler.SparkListenerEvent
+import org.apache.spark.storage.{BlockId, BlockManagerId}
+
+sealed trait TraceEvent extends Product with Serializable
 case object JVMStart extends TraceEvent
 case object MainStart extends TraceEvent
 case object MainEnd extends TraceEvent
-case class SpawnExecutor(id: String) extends TraceEvent
-case class TrackerRegisterShuffle(id: Int) extends TraceEvent
-case class RegisterShuffle(id: Int) extends TraceEvent
-case class UnregisterShuffle(id: Int) extends TraceEvent
-case class BlockFetch(host: String, port: Int, execId: String, blockIds: Seq[String]) extends
+final case class SparkHost(name: String, host: String, port: Int)
+case class ChannelInfo(src: SparkHost, dst: SparkHost)
+final case class RPC(src: SparkHost, dst: SparkHost, payload: Any) extends TraceEvent
+final case class MissedRPC(src: SparkHost, dst: SparkHost, payload: Any) extends TraceEvent
+final case class SpawnExecutor(id: String) extends TraceEvent
+final case class TrackerRegisterShuffle(id: Int) extends TraceEvent
+final case class RegisterShuffle(id: Int) extends TraceEvent
+final case class UnregisterShuffle(id: Int) extends TraceEvent
+final case class BlockFetch(host: String, port: Int, execId: String, blockIds: Seq[String]) extends
   TraceEvent
-case class BlockUpload(host: String, port: Int, execId: String, blockId: String) extends TraceEvent
-case class SubmitTaskSet(id: String) extends TraceEvent
-case class DagScheduler(event: Any) extends TraceEvent
+final case class BlockUpload(host: String, port: Int, execId: String, blockId: String) extends
+  TraceEvent
+final case class SubmitTaskSet(id: String) extends TraceEvent
+final case class FinishTaskSet(id: String) extends TraceEvent
+final case class DagSchedulerEvent(event: Any) extends TraceEvent
+final case class ListenerEvent(event: SparkListenerEvent) extends TraceEvent
+final case class GetBlock(id: BlockId) extends TraceEvent
+final case class GetBlockData(id: BlockId) extends TraceEvent
+final case class PutBlock(id: BlockId) extends TraceEvent
+final case class DeleteBlock(id: BlockId) extends TraceEvent
+final case class FreeBlock(id: BlockId) extends TraceEvent
+final case class BMMRegister(id: BlockManagerId) extends TraceEvent
+final case class BMMUpdate(id: BlockId) extends TraceEvent
+final case class BMMRemoveBlock(id: BlockId) extends TraceEvent
+final case class BMMRemoveRDD(id: Int) extends TraceEvent
+final case class BMMRemoveShuffle(id: Int) extends TraceEvent
+final case class BMMRemoveBroadcast(id: Long) extends TraceEvent
 
-abstract class TraceLogger(cls: String) {
-  private val logger = LoggerFactory.getLogger(cls)
-  def write(values: Map[String, String]): Unit = logger.trace(columns.map(values(_)).mkString("\t"))
-  val columns: List[String]
-  protected def init = logger.trace(columns.mkString("\t"))
-}
-
-object TraceId {
+object TraceLogger extends Logging {
   val id: String = UUID.randomUUID.toString
-}
-
-object EventTraceLogger extends TraceLogger("org.apache.spark.util.tracing.EventTraceLogger") {
-  override val columns = List("id", "time", "type")
+  val cols = List("id", "time", "type")
+  private def write(values: Map[String, String]): Unit = logTrace(cols.map(values(_)).
+    mkString("\t"))
   def log(event: TraceEvent, time: Long = System.currentTimeMillis): Unit = {
-    write(Map("id" -> TraceId.id, "time" -> time.toString, "type" -> event.toString.split("\n")(0)))
+    write(Map("id" -> id, "time" -> time.toString, "type" -> event.toString.split("\n")(0)))
   }
   def logStartup(): Unit = {
     val now = System.currentTimeMillis
@@ -58,11 +75,21 @@ object EventTraceLogger extends TraceLogger("org.apache.spark.util.tracing.Event
     log(JVMStart, start)
     log(MainStart, now)
   }
-  init
+  def channelInfo(channel: Channel, sendName: String, recvName: String): ChannelInfo = {
+    def addrsplit(addr: SocketAddress) = if (addr == null) ("", 0) else {
+      val inetAddr = addr.asInstanceOf[InetSocketAddress]
+      (inetAddr.getAddress.toString, inetAddr.getPort)
+    }
+    val sender = addrsplit(channel.remoteAddress)
+    val recipient = addrsplit(channel.localAddress)
+    ChannelInfo(SparkHost(sendName, sender._1, sender._2), SparkHost(recvName, recipient._1,
+      recipient._2))
+  }
+  logTrace(cols.mkString("\t"))
 }
 
-object RpcTraceLogger extends TraceLogger("org.apache.spark.util.tracing.RpcTraceLogger") {
-  override val columns = List("id", "time", "src_name", "src_addr", "src_port", "dst_name",
-    "dst_addr", "dst_port", "type")
-  init
+class ListenerTraceLogger() extends SparkFirehoseListener() {
+  override def onEvent(event: SparkListenerEvent): Unit = {
+    TraceLogger.log(ListenerEvent(event))
+  }
 }

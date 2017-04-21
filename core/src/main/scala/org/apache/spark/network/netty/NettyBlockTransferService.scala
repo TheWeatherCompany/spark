@@ -92,7 +92,7 @@ private[spark] class NettyBlockTransferService(
       blockIds: Array[String],
       listener: BlockFetchingListener): Unit = {
     logTrace(s"Fetch blocks from $host:$port (executor id $execId)")
-    EventTraceLogger.log(BlockFetch(host, port, execId, blockIds))
+    TraceLogger.log(BlockFetch(host, port, execId, blockIds))
     try {
       val blockFetchStarter = new RetryingBlockFetcher.BlockFetchStarter {
         override def createAndStart(blockIds: Array[String], listener: BlockFetchingListener) {
@@ -126,7 +126,7 @@ private[spark] class NettyBlockTransferService(
       blockData: ManagedBuffer,
       level: StorageLevel,
       classTag: ClassTag[_]): Future[Unit] = {
-    EventTraceLogger.log(BlockUpload(hostname, port, execId, blockId.name))
+    TraceLogger.log(BlockUpload(hostname, port, execId, blockId.name))
     val result = Promise[Unit]()
     val client = clientFactory.createClient(hostname, port)
 

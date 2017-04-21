@@ -171,7 +171,7 @@ private[spark] class TaskSchedulerImpl(
   }
 
   override def submitTasks(taskSet: TaskSet) {
-    EventTraceLogger.log(SubmitTaskSet(taskSet.id))
+    TraceLogger.log(SubmitTaskSet(taskSet.id))
     val tasks = taskSet.tasks
     logInfo("Adding task set " + taskSet.id + " with " + tasks.length + " tasks")
     this.synchronized {
@@ -240,6 +240,7 @@ private[spark] class TaskSchedulerImpl(
    * cleaned up.
    */
   def taskSetFinished(manager: TaskSetManager): Unit = synchronized {
+    TraceLogger.log(FinishTaskSet(manager.taskSet.id))
     taskSetsByStageIdAndAttempt.get(manager.taskSet.stageId).foreach { taskSetsForStage =>
       taskSetsForStage -= manager.taskSet.stageAttemptId
       if (taskSetsForStage.isEmpty) {

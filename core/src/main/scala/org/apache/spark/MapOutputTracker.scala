@@ -371,7 +371,7 @@ private[spark] class MapOutputTrackerMaster(conf: SparkConf,
     if (mapStatuses.put(shuffleId, new Array[MapStatus](numMaps)).isDefined) {
       throw new IllegalArgumentException("Shuffle ID " + shuffleId + " registered twice")
     }
-    EventTraceLogger.log(TrackerRegisterShuffle(shuffleId))
+    TraceLogger.log(TrackerRegisterShuffle(shuffleId))
     // add in advance
     shuffleIdLocks.putIfAbsent(shuffleId, new Object())
   }

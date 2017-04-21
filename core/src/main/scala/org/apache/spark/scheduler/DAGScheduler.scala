@@ -1602,7 +1602,7 @@ private[scheduler] class DAGSchedulerEventProcessLoop(dagScheduler: DAGScheduler
    */
   override def onReceive(event: DAGSchedulerEvent): Unit = {
     val timerContext = timer.time()
-    EventTraceLogger.log(DagScheduler(event))
+    TraceLogger.log(DagSchedulerEvent(event))
     try {
       doOnReceive(event)
     } finally {

@@ -751,7 +751,7 @@ object ApplicationMaster extends Logging {
   private var master: ApplicationMaster = _
 
   def main(args: Array[String]): Unit = {
-    EventTraceLogger.logStartup()
+    TraceLogger.logStartup()
     SignalUtils.registerLogger(log)
     val amArgs = new ApplicationMasterArguments(args)
 
@@ -766,7 +766,7 @@ object ApplicationMaster extends Logging {
     SparkHadoopUtil.get.runAsSparkUser { () =>
       master = new ApplicationMaster(amArgs, new YarnRMClient)
       val exitCode = master.run()
-      EventTraceLogger.log(MainEnd)
+      TraceLogger.log(MainEnd)
       System.exit(exitCode)
     }
   }

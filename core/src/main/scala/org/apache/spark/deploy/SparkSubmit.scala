@@ -117,7 +117,7 @@ object SparkSubmit {
   // scalastyle:on println
 
   def main(args: Array[String]): Unit = {
-    EventTraceLogger.logStartup()
+    TraceLogger.logStartup()
     val appArgs = new SparkSubmitArguments(args)
     if (appArgs.verbose) {
       // scalastyle:off println
@@ -129,7 +129,7 @@ object SparkSubmit {
       case SparkSubmitAction.KILL => kill(appArgs)
       case SparkSubmitAction.REQUEST_STATUS => requestStatus(appArgs)
     }
-    EventTraceLogger.log(MainEnd)
+    TraceLogger.log(MainEnd)
   }
 
   /**

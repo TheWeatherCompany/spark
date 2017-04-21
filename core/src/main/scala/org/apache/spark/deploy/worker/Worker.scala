@@ -691,14 +691,14 @@ private[deploy] object Worker extends Logging {
   val ENDPOINT_NAME = "Worker"
 
   def main(argStrings: Array[String]) {
-    EventTraceLogger.logStartup()
+    TraceLogger.logStartup()
     Utils.initDaemon(log)
     val conf = new SparkConf
     val args = new WorkerArguments(argStrings, conf)
     val rpcEnv = startRpcEnvAndEndpoint(args.host, args.port, args.webUiPort, args.cores,
       args.memory, args.masters, args.workDir, conf = conf)
     rpcEnv.awaitTermination()
-    EventTraceLogger.log(MainEnd)
+    TraceLogger.log(MainEnd)
   }
 
   def startRpcEnvAndEndpoint(

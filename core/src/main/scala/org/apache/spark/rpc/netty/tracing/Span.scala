@@ -18,7 +18,6 @@
 package org.apache.spark.rpc.netty.tracing
 
 import java.io.Serializable
-import java.net.SocketAddress
 import java.util.concurrent.atomic.AtomicLong
 import java.util.Random
 
@@ -26,30 +25,22 @@ import io.netty.channel.Channel
 
 import org.apache.spark.util.tracing._
 
-private[netty] class Span[T](payload: T, writer: SpanWriter) extends Serializable {
-  private case class ReceiveInfo(source: (String, String), destination: (String, String))
+private[netty] class Span[T](payload: T, writer: SpanInfo) extends Serializable {
   private val id = writer.makeId
   private val srcName = writer.name
   private val sent = System.currentTimeMillis
 
-  private def write(out: SpanWriter, info: ReceiveInfo): Unit = {
-    RpcTraceLogger.write(Map("id" -> id.toString, "time" -> sent.toString, "src_name" -> srcName,
-      "src_addr" -> info.source._1, "src_port" -> info.source._2, "dst_name" -> out.name,
-      "dst_addr" -> info.destination._1, "dst_port" -> info.destination._2, "type" ->
-      payload.toString))
+  private def write(info: ChannelInfo): Unit = {
+    TraceLogger.log(RPC(info.src, info.dst, payload), sent)
   }
-  def recpt(channel: Channel, writer: SpanWriter): Unit = {
-    def addrsplit(addr: SocketAddress) = if (addr == null) ("", "") else addr.toString
-      .substring(1).split(":") match {
-      case Array(x, y) => (x, y)
-    }
-    val info = ReceiveInfo(addrsplit(channel.remoteAddress()), addrsplit(channel.localAddress()))
-    write(writer, info)
+  def recpt(channel: Channel, spanInfo: SpanInfo): Unit = {
+    val recvInfo = TraceLogger.channelInfo(channel, srcName, spanInfo.name)
+    write(recvInfo)
   }
   def getPayload: T = payload
 }
 
-private[netty] class SpanWriter(val name: String) {
+private[netty] class SpanInfo(val name: String) {
   private var nextid = new AtomicLong(new Random().nextInt.toLong + Integer.MAX_VALUE)
   def makeId: Long = nextid.incrementAndGet
 }

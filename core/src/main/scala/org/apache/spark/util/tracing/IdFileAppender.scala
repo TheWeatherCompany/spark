@@ -21,5 +21,5 @@ import org.apache.log4j.FileAppender
 
 class IdFileAppender extends FileAppender {
   override def setFile(fileName: String): Unit =
-    super.setFile(fileName.replaceAll("%i", TraceId.id))
+    super.setFile(fileName.replaceAll("%i", TraceLogger.id))
 }
