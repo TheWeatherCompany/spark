@@ -55,6 +55,7 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.internal.config._
 import org.apache.spark.launcher.{LauncherBackend, SparkAppHandle, YarnCommandBuilderUtils}
 import org.apache.spark.util.{CallerContext, Utils}
+import org.apache.spark.util.tracing._
 
 private[spark] class Client(
     val args: ClientArguments,
@@ -172,7 +173,9 @@ private[spark] class Client(
 
       // Finally, submit and monitor the application
       logInfo(s"Submitting application $appId to ResourceManager")
+      TraceLogger.log(SubmitApplication)
       yarnClient.submitApplication(appContext)
+      TraceLogger.log(SubmittedApplication(appId.getId))
       appId
     } catch {
       case e: Throwable =>
@@ -470,6 +473,7 @@ private[spark] class Client(
         destName: Option[String] = None,
         targetDir: Option[String] = None,
         appMasterOnly: Boolean = false): (Boolean, String) = {
+      TraceLogger.log(Distribute(path))
       val trimmedPath = path.trim()
       val localURI = Utils.resolveURI(trimmedPath)
       if (localURI.getScheme != LOCAL_SCHEME) {
@@ -512,6 +516,7 @@ private[spark] class Client(
      * Note that the archive cannot be a "local" URI. If none of the above settings are found,
      * then upload all files found in $SPARK_HOME/jars.
      */
+    TraceLogger.log(SparkUpload)
     val sparkArchive = sparkConf.get(SPARK_ARCHIVE)
     if (sparkArchive.isDefined) {
       val archive = sparkArchive.get
@@ -568,6 +573,7 @@ private[spark] class Client(
             destName = Some(LOCALIZED_LIB_DIR))
       }
     }
+    TraceLogger.log(SparkUploadDone)
 
     /**
      * Copy user jar to the distributed cache if their scheme is not "local".

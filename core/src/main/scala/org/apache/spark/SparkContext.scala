@@ -59,6 +59,7 @@ import org.apache.spark.storage.BlockManagerMessages.TriggerThreadDump
 import org.apache.spark.ui.{ConsoleProgressBar, SparkUI}
 import org.apache.spark.ui.jobs.JobProgressListener
 import org.apache.spark.util._
+import org.apache.spark.util.tracing._
 
 /**
  * Main entry point for Spark functionality. A SparkContext represents the connection to a Spark
@@ -72,6 +73,7 @@ import org.apache.spark.util._
  */
 class SparkContext(config: SparkConf) extends Logging {
 
+  TraceLogger.log(CreateSparkContext)
   // The call site where this SparkContext was constructed.
   private val creationSite: CallSite = Utils.getCallSite()
 
@@ -2228,6 +2230,7 @@ class SparkContext(config: SparkConf) extends Logging {
   // context as having finished construction.
   // NOTE: this must be placed at the end of the SparkContext constructor.
   SparkContext.setActiveContext(this, allowMultipleContexts)
+  TraceLogger.log(InitializedSparkContext)
 }
 
 /**

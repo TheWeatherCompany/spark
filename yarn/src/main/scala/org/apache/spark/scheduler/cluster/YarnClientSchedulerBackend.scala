@@ -26,6 +26,7 @@ import org.apache.spark.deploy.yarn.{Client, ClientArguments, YarnSparkHadoopUti
 import org.apache.spark.internal.Logging
 import org.apache.spark.launcher.SparkAppHandle
 import org.apache.spark.scheduler.TaskSchedulerImpl
+import org.apache.spark.util.tracing._
 
 private[spark] class YarnClientSchedulerBackend(
     scheduler: TaskSchedulerImpl,
@@ -41,6 +42,7 @@ private[spark] class YarnClientSchedulerBackend(
    * This waits until the application is running.
    */
   override def start() {
+    TraceLogger.log(StartYarnClient)
     val driverHost = conf.get("spark.driver.host")
     val driverPort = conf.get("spark.driver.port")
     val hostport = driverHost + ":" + driverPort

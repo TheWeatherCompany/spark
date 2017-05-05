@@ -13,6 +13,10 @@ dest="/test/spark-tracing"
 traceout="/tmp/spark-trace"
 port="5010"
 
+testclass="org.apache.spark.examples.SparkPi"
+testjar="spark-examples_2.11-2.1.0.jar"
+iters=20
+
 while [[ $# > 0 ]]
 	do case "$1" in
 	"dist")
@@ -34,7 +38,7 @@ while [[ $# > 0 ]]
 		cp $basedir/conf/log4j.properties{.template,}
 		cat <<- ! >> $basedir/conf/log4j.properties
 
-		log4j.rootCategory=WARN, console
+		log4j.rootCategory=INFO, console
 
 		log4j.logger.org.apache.spark.util.tracing.TraceLogger=TRACE, eventtrace
 		log4j.additivity.org.apache.spark.util.tracing.TraceLogger=false
@@ -44,6 +48,9 @@ while [[ $# > 0 ]]
 		log4j.appender.eventtrace.Append=false
 		log4j.appender.eventtrace.layout=org.apache.log4j.PatternLayout
 		log4j.appender.eventtrace.layout.ConversionPattern=%m%n
+		!
+		cat <<- ! >> $basedir/conf/spark-env.sh
+		HADOOP_CONF_DIR=/etc/hadoop/conf
 		!
 		#chmod -R 777 $basedir
 		;;
@@ -56,22 +63,25 @@ while [[ $# > 0 ]]
 		#ssh -t $user@$master "$dest/sbin/start-master.sh; for host in $slaves; do ssh \$host $dest/sbin/start-slave.sh $master:7077; done"
 
 		#firefox http://$master:$port &
-		ssh -t $user@$master sudo -iu notebook HADOOP_CONF_DIR=/etc/hadoop/conf $dest/bin/spark-shell --master yarn < $basedir/matt/sparkpi.scala
+		ssh -t $user@$master sudo -iu notebook $dest/bin/spark-submit --master yarn --class "$testclass" "$dest/examples/jars/$testjar" $iters
+		;;
+	"collect")
 		ssh -t $user@$master "sudo chown -R dev-user $traceout; for host in $slaves; do ssh -t \$host sudo chown -R dev-user $traceout; done"
 		ssh -t $user@$master "for host in $slaves; do rsync -av \$host:$traceout/ $traceout; done"
-		localout="$resultdir/trace_$(date +"%Y%m%d-%H%M%S")"
+		localout="$resultdir/remote"
+		rm -rf "$localout"
 		mkdir "$localout"
 		rsync -av --progress $user@$master:$traceout/ "$localout"
 		ssh -t $user@$master "rm -r $traceout; for host in $slaves; do ssh -t \$host rm -r $traceout; done"
 		;;
 	"local")
-		rm -f $traceout
+		rm -rf $traceout
 		$distdir/sbin/stop-all.sh
 		#$distdir/sbin/start-master.sh
 		#$distdir/sbin/start-slave.sh spark://localhost:7077
 
 		#firefox http://localhost:8088 &
-		$distdir/bin/spark-shell --master yarn < $basedir/matt/sparkpi.scala
+		$distdir/bin/spark-submit --master yarn --class "$testclass" "$distdir/examples/jars/$testjar" $iters
 		;;
 	*)
 		echo "Unknown action $1"

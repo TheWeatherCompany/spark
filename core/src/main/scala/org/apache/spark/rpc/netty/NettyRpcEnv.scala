@@ -259,27 +259,11 @@ private[netty] class NettyRpcEnv(
     NettyRpcEnv.currentClient.withValue(client) {
       deserialize { () =>
         val rpc = javaSerializerInstance.deserialize[T](bytes)
-        val info = TraceLogger.channelInfo(client.getChannel, "<sender>", spanInfo.name)
-        TraceLogger.log(RPC(info.src, info.dst, rpc))
+        TraceLogger.log(RPC(client.getChannel, spanInfo.name, rpc))
         rpc
-        /* try {
-          val span = javaSerializerInstance.deserialize[Span[T]](bytes)
+        /* val span = javaSerializerInstance.deserialize[Span[T]](bytes)
           span.recpt(client.getChannel, spanInfo)
-          span.getPayload
-        }
-        catch
-        {
-          case e: ClassCastException =>
-            bytes.rewind()
-            val payload: T = javaSerializerInstance.deserialize[T](bytes)
-            def addrsplit(addr: SocketAddress) = if (addr == null) ("", 0) else {
-              val inetAddr = addr.asInstanceOf[InetSocketAddress]
-              (inetAddr.getAddress.toString, inetAddr.getPort)
-            }
-            val info = TraceLogger.channelInfo(client.getChannel, "<unknown>", spanInfo.name)
-            TraceLogger.log(MissedRPC(info.src, info.dst, payload))
-            payload
-        } */
+          span.getPayload */
       }
     }
   }

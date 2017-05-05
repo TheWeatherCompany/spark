@@ -34,8 +34,8 @@ private[netty] class Span[T](payload: T, writer: SpanInfo) extends Serializable 
     TraceLogger.log(RPC(info.src, info.dst, payload), sent)
   }
   def recpt(channel: Channel, spanInfo: SpanInfo): Unit = {
-    val recvInfo = TraceLogger.channelInfo(channel, srcName, spanInfo.name)
-    write(recvInfo)
+    // val recvInfo = TraceLogger.channelInfo(channel, srcName, spanInfo.name)
+    // write(recvInfo)
   }
   def getPayload: T = payload
 }

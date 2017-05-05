@@ -183,6 +183,7 @@ private[spark] class ApplicationMaster(
 
   final def run(): Int = {
     try {
+      TraceLogger.log(DebugMessage("RunApplicationMaster"))
       val appAttemptId = client.getAttemptId()
 
       var attemptID: Option[String] = None

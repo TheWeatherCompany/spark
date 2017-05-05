@@ -191,6 +191,7 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
       Utils.checkHost(hostname)
 
       // Bootstrap to fetch the driver's Spark properties.
+      TraceLogger.log(FetchDriverProps)
       val executorConf = new SparkConf
       val port = executorConf.getInt("spark.executor.port", 0)
       val fetcher = RpcEnv.create(
@@ -206,6 +207,7 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
       fetcher.shutdown()
 
       // Create SparkEnv using properties we fetched from the driver.
+      TraceLogger.log(CreateSparkEnv)
       val driverConf = new SparkConf()
       for ((key, value) <- props) {
         // this is required for SSL in standalone mode
@@ -224,6 +226,7 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
       val env = SparkEnv.createExecutorEnv(
         driverConf, executorId, hostname, port, cores, cfg.ioEncryptionKey, isLocal = false)
 
+      TraceLogger.log(SetupEndpoint)
       env.rpcEnv.setupEndpoint("Executor", new CoarseGrainedExecutorBackend(
         env.rpcEnv, driverUrl, executorId, hostname, cores, userClassPath, env))
       workerUrl.foreach { url =>
